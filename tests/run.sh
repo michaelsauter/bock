@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -ue
 
-PATH=.:$PATH
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PATH=${SCRIPT_DIR}:$PATH
 
 git mock --init
 

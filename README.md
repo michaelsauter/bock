@@ -27,7 +27,8 @@ set -ue
 curl -L "https://raw.githubusercontent.com/michaelsauter/bock/master/bock.sh" -o oc && chmod +x oc
 
 # Prepend to your path
-PATH=.:$PATH
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PATH=${SCRIPT_DIR}:$PATH
 
 # Init / clean state
 oc mock --init
