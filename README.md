@@ -13,9 +13,9 @@ be compared by calling `mock --verify`.
 
 ## Usage
 
-To use this script, copy it into a folder with the name of the binary to mock,
-e.g. `git` or `oc`. Then prepend your `$PATH` with that folder in your test
-script. As an example, see
+To use `bock`, download `bock.sh` into a folder, but give it the  name of the
+binary to mock, e.g. `git` or `oc`. Then prepend your `$PATH` with that folder
+in your test script. As an example, see
 https://github.com/michaelsauter/bock/blob/master/tests/run.sh or the following
 example:
 
