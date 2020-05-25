@@ -15,14 +15,16 @@ be compared by calling `mock --verify`.
 
 To use this script, copy it into a folder with the name of the binary to mock,
 e.g. `git` or `oc`. Then prepend your `$PATH` with that folder in your test
-script. As an example, see `tests/run.sh`.
+script. As an example, see
+https://github.com/michaelsauter/bock/blob/master/tests/run.sh or the following
+example:
 
 ```
 #!/usr/bin/env bash
 set -ue
 
 # Download script
-curl -L "https://raw.githubusercontent.com/opendevstack/tailor/master/bock.sh" -o oc && chmod +x oc
+curl -L "https://raw.githubusercontent.com/michaelsauter/bock/master/bock.sh" -o oc && chmod +x oc
 
 # Prepend to your path
 PATH=.:$PATH
