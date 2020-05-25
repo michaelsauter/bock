@@ -21,6 +21,8 @@
 #
 set -ue
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 INIT="no"
 VERIFY="no"
 RECEIVE=""
@@ -43,8 +45,6 @@ function usage {
     printf "\t--stderr\tSTDERR to return from the interaction\n"
     printf "\t--status\tExit code of the interaction\n"
 }
-
-echoerr() { echo "$@" 1>&2; }
 
 if [[ "$#" -gt 0 && "$1" == "mock" ]]; then
     shift
@@ -77,10 +77,10 @@ if [[ "$#" -gt 0 && "$1" == "mock" ]]; then
     esac; shift; done
 
     if [ "${INIT}" == "yes" ]; then
-        rm .bock-want &> /dev/null || true
-        rm .bock-got &> /dev/null || true
-        touch .bock-want
-        touch .bock-got
+        rm "${SCRIPT_DIR}/.bock-want" &> /dev/null || true
+        rm "${SCRIPT_DIR}/.bock-got" &> /dev/null || true
+        touch "${SCRIPT_DIR}/.bock-want"
+        touch "${SCRIPT_DIR}/.bock-got"
         exit 0
     fi
 
@@ -94,19 +94,19 @@ if [[ "$#" -gt 0 && "$1" == "mock" ]]; then
             wantTimes=$(echo "${wantLine}" | cut -d "#" -f 5)
             if [ "${wantTimes}" != "" ]; then
                 checks=$((checks+1))
-                gotTimes=$(grep "${wantReceive}" .bock-got | wc -l | tr -d ' ')
+                gotTimes=$(grep -- "${wantReceive}" "${SCRIPT_DIR}/.bock-got" | wc -l | tr -d ' ')
                 if [ "${wantTimes}" != "${gotTimes}" ]; then
                     echo "Want '${wantReceive}' ${wantTimes} times, got ${gotTimes}."
                     failures=$((failures+1))
                 fi
             fi
-        done <.bock-want
+        done <"${SCRIPT_DIR}/.bock-want"
 
         exitCode=0
         if [ "${failures}" -gt 0 ]; then
             echo ""
             echo "Received calls:"
-            cat .bock-got
+            cat "${SCRIPT_DIR}/.bock-got"
             echo ""
             echo "ERROR (${failures} failed out of ${checks})"
             exitCode=1
@@ -115,21 +115,21 @@ if [[ "$#" -gt 0 && "$1" == "mock" ]]; then
             echo "SUCCESS"
         fi
 
-        rm .bock-want || true
-        rm .bock-got || true
+        rm "${SCRIPT_DIR}/.bock-want" || true
+        rm "${SCRIPT_DIR}/.bock-got" || true
         exit ${exitCode}
     fi
 
     if [ -n "${RECEIVE}" ]; then
-        echo "${RECEIVE}#${RETURN_STDOUT}#${RETURN_STDERR}#${RETURN_STATUS}#${TIMES}" >> .bock-want
+        echo "${RECEIVE}#${RETURN_STDOUT}#${RETURN_STDERR}#${RETURN_STATUS}#${TIMES}" >> "${SCRIPT_DIR}/.bock-want"
     fi
 else
-    if [ ! -f .bock-got ]; then
+    if [ ! -f "${SCRIPT_DIR}/.bock-got" ]; then
         echo "Run '$0 mock --init' first"
         exit 1
     fi
 
-    echo $@ >> .bock-got
+    echo $@ >> "${SCRIPT_DIR}/.bock-got"
 
     while read wantLine; do
         wantReceive=$(echo "${wantLine}" | cut -d "#" -f 1)
@@ -145,6 +145,6 @@ else
             wantStatus=$(echo "${wantLine}" | cut -d "#" -f 4)
             exit ${wantStatus}
         fi
-    done <.bock-want
+    done <"${SCRIPT_DIR}/.bock-want"
     
 fi
