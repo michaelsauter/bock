@@ -15,7 +15,7 @@ be compared by calling `mock --verify`.
 
 To use `bock`, download `bock.sh` into a folder, but give it the  name of the
 binary to mock, e.g. `git` or `oc`. Then prepend your `$PATH` with that folder
-in your test script. As an example, see
+in your test script. See
 https://github.com/michaelsauter/bock/blob/master/tests/run.sh or the following
 example:
 
@@ -30,15 +30,12 @@ curl -L "https://raw.githubusercontent.com/michaelsauter/bock/master/bock.sh" -o
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATH=${SCRIPT_DIR}:$PATH
 
-# Init / clean state
-oc mock --init
+# Check interactions at the end
+trap "git mock --verify" EXIT
 
 # Define interactions
 oc mock --receive whoami --stdout "Max Mustermann" --times 1
 
 # Run code that uses "oc" binary ... typically you'd execute your script to test here
 oc whoami
-
-# Check interactions
-oc mock --verify
 ```

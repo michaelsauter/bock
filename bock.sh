@@ -23,7 +23,6 @@ set -ue
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-INIT="no"
 VERIFY="no"
 RECEIVE=""
 TIMES=""
@@ -36,7 +35,6 @@ function usage {
     printf "Usage:\n\n"
     printf "\t--help\t\tPrint usage\n"
     printf "\n"
-    printf "\t--init\t\tInit state\n"
     printf "\t--verify\tCheck interactions\n"
     printf "\n"
     printf "\t--receive\tDefine interaction\n"
@@ -69,23 +67,18 @@ if [[ "$#" -gt 0 && "$1" == "mock" ]]; then
         --times) TIMES="$2"; shift;;
         --times=*) TIMES="${1#*=}";;
 
-        --init) INIT="yes";;
-
         --verify) VERIFY="yes";;
 
         *) echo "Unknown parameter passed: $1"; exit 1;;
     esac; shift; done
 
-    if [ "${INIT}" == "yes" ]; then
-        rm "${SCRIPT_DIR}/.bock-want" &> /dev/null || true
-        rm "${SCRIPT_DIR}/.bock-got" &> /dev/null || true
-        touch "${SCRIPT_DIR}/.bock-want"
-        touch "${SCRIPT_DIR}/.bock-got"
-        exit 0
-    fi
-
     if [ "${VERIFY}" == "yes" ]; then
         echo ""
+        if [ ! -f "${SCRIPT_DIR}/.bock-want" ]; then
+            echo "No interactions defined, nothing to verify."
+            exit 1
+        fi
+        touch "${SCRIPT_DIR}/.bock-got"
         checks=0
         failures=0
         # check that we got everything we wanted the correct amount of times
@@ -124,8 +117,9 @@ if [[ "$#" -gt 0 && "$1" == "mock" ]]; then
         echo "${RECEIVE}#${RETURN_STDOUT}#${RETURN_STDERR}#${RETURN_STATUS}#${TIMES}" >> "${SCRIPT_DIR}/.bock-want"
     fi
 else
-    if [ ! -f "${SCRIPT_DIR}/.bock-got" ]; then
-        echo "Run '$0 mock --init' first"
+    if [ ! -f "${SCRIPT_DIR}/.bock-want" ]; then
+        echo "No interactions defined yet. Run '$0 mock --receive ...' first."
+        echo "If you really want to do this, run 'touch ${SCRIPT_DIR}/.bock-want'."
         exit 1
     fi
 

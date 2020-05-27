@@ -4,7 +4,7 @@ set -ue
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATH=${SCRIPT_DIR}:$PATH
 
-git mock --init
+trap "git mock --verify" EXIT
 
 git mock --receive log --times 1
 
@@ -17,5 +17,3 @@ git log
 git show HEAD
 
 # git commit -m "foo"
-
-git mock --verify
