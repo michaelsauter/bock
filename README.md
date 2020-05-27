@@ -31,7 +31,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATH=${SCRIPT_DIR}:$PATH
 
 # Check interactions at the end
-trap "git mock --verify" EXIT
+trap "oc mock --verify" EXIT
 
 # Define interactions
 oc mock --receive whoami --stdout "Max Mustermann" --times 1
